@@ -68,7 +68,7 @@ func (node BNode) setOffset(idx uint16, offset uint16) {
 
 func (node BNode) kvPos(idx uint16) uint16 {
 	utils.Assert(idx <= node.nkeys(), "idx <= node.nkeys()")
-	return HEADER + 8*node.nkeys() + 2*node.nkeys() + node.getOffset(idx)
+	return HEADER + 10*node.nkeys() + node.getOffset(idx)
 }
 
 func (node BNode) getKey(idx uint16) []byte {
@@ -83,7 +83,7 @@ func (node BNode) getVal(idx uint16) []byte {
 	pos := node.kvPos(idx)
 	klen := binary.LittleEndian.Uint16(node.data[pos+0:])
 	vlen := binary.LittleEndian.Uint16(node.data[pos+2:])
-	return node.data[pos+klen:][:vlen]
+	return node.data[pos+4+klen:][:vlen]
 }
 
 // node size in bytes
@@ -218,19 +218,19 @@ const (
 	// for effeciancy and neat design the max key size
 	BTREE_MAX_KEY_SIZE = 1000
 
-	// BRTEE_MAX_VAL_SIZE the max value size
-	BRTEE_MAX_VAL_SIZE = 3000
+	// BTREE_MAX_VAL_SIZE the max value size
+	BTREE_MAX_VAL_SIZE = 3000
 )
 
 type BTree struct {
 	root uint64 // pointer (a nonzero page number)
 
 	// callbacks for managing on-disk pages
-	get func(uint642 uint64) BNode // dereference a pointer
+	get func(ptr uint64) BNode // dereference a pointer
 
 	new func(node BNode) uint64 // allocate a page
 
-	del func(uint642 uint64) // deallocate a page
+	del func(ptr uint64) // deallocate a page
 }
 
 func treeInsert(tree *BTree, node BNode, key []byte, val []byte) BNode {
@@ -420,11 +420,74 @@ func shouldMerge(tree *BTree, node BNode, idx uint16, updated BNode) (int, BNode
 	return 0, BNode{}
 }
 
+// not know for sure, whether this is right?
 func nodeReplace2Kid(new BNode, old BNode, idx uint16, ptr uint64, key []byte) {
 	new.setHeader(BNODE_NODE, old.nkeys())
+	new.setPtr(idx, ptr)
 	nodeAppendRange(new, old, 0, 0, idx)
-	for i, node := range kids {
-		nodeAppendKV(new, idx+uint16(i), node, node.getKey(0), nil)
+	nodeAppendKV(new, idx, ptr, key, nil)
+}
+
+func (tree *BTree) Delete(key []byte) bool {
+	utils.Assert(len(key) != 0, "len(key) != 0")
+	utils.Assert(len(key) <= BTREE_MAX_KEY_SIZE, "len(key) <= BTREE_MAX_KEY_SIZE")
+	if tree.root == 0 {
+		return false
 	}
-	nodeAppendRange(new, old, idx+inc, idx+1, old.nkeys()-(idx+1))
+	updated := treeDelete(tree, tree.get(tree.root), key)
+	if len(updated.data) == 0 {
+		return false // not found
+	}
+	tree.del(tree.root)
+	if updated.btype() == BNODE_NODE && updated.nkeys() == 1 {
+		// remove a level
+		tree.root = updated.getPtr(0)
+	} else {
+		tree.root = tree.new(updated)
+	}
+	return true
+}
+
+// the interface
+func (tree *BTree) Insert(key []byte, val []byte) {
+	utils.Assert(len(key) != 0, "len(key) != 0")
+	utils.Assert(len(key) <= BTREE_MAX_KEY_SIZE, "len(key) <= BTREE_MAX_KEY_SIZE")
+	utils.Assert(len(val) <= BTREE_MAX_VAL_SIZE, "len(val) <= BTREE_MAX_VAL_SIZE")
+	if tree.root == 0 {
+		// create the first node
+		root := BNode{data: make([]byte, BTREE_PAGE_SIZE)}
+		root.setHeader(BNODE_LEAF, 2)
+		// a dummy key, this makes the tree cover the whole key space. // thus a lookup can always find a containing node. nodeAppendKV(root, 0, 0, nil, nil)
+		nodeAppendKV(root, 1, 0, key, val)
+		tree.root = tree.new(root)
+		return
+	}
+	node := tree.get(tree.root)
+	tree.del(tree.root)
+	node = treeInsert(tree, node, key, val)
+	nsplit, splitted := nodeSplit3(node)
+	if nsplit > 1 {
+		// the root was split, add a new level.
+		root := BNode{data: make([]byte, BTREE_PAGE_SIZE)}
+		root.setHeader(BNODE_NODE, nsplit)
+		for i, knode := range splitted[:nsplit] {
+			ptr, key := tree.new(knode), knode.getKey(0)
+			nodeAppendKV(root, uint16(i), ptr, key, nil)
+		}
+		tree.root = tree.new(root)
+	} else {
+		tree.root = tree.new(splitted[0])
+	}
+}
+
+func (tree *BTree) Get(key []byte) []byte {
+	utils.Assert(len(key) != 0, "len(key) != 0")
+	utils.Assert(len(key) <= BTREE_MAX_KEY_SIZE, "len(key) <= BTREE_MAX_KEY_SIZE")
+	if tree.root == 0 {
+		return []byte{}
+	}
+	node := tree.get(tree.root)
+	idx := nodeLookupLE(node, key)
+
+	return node.getVal(idx)
 }

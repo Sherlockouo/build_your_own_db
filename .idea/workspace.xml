@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1b3e6e0-91a4-4f61-af5b-8fc81999bbaf" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/utils/utils.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/kv/kv.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/kv/persist.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/btree/Btree.go" beforeDir="false" afterPath="$PROJECT_DIR$/btree/Btree.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/btree/bTree_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/btree/bTree_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,10 +49,11 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Go Test.TestPanic in Build_Your_Own_DB_In_Go/BTree">
+  <component name="RunManager" selected="Go Test.TestBTree_Delete in Build_Your_Own_DB_In_Go/btree">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="Build_Your_Own_DB_In_Go" />
       <working_directory value="$PROJECT_DIR$" />
@@ -65,6 +70,30 @@
       <package value="Build_Your_Own_DB_In_Go" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestBTree_Delete in Build_Your_Own_DB_In_Go/btree" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="Build_Your_Own_DB_In_Go" />
+      <working_directory value="$PROJECT_DIR$/btree" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="Build_Your_Own_DB_In_Go/btree" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestBTree_Delete\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestBTree_Insert in Build_Your_Own_DB_In_Go/btree" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="Build_Your_Own_DB_In_Go" />
+      <working_directory value="$PROJECT_DIR$/btree" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="Build_Your_Own_DB_In_Go/btree" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestBTree_Insert\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestPanic in Build_Your_Own_DB_In_Go/BTree" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -91,6 +120,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestBTree_Delete in Build_Your_Own_DB_In_Go/btree" />
+        <item itemvalue="Go Test.TestBTree_Insert in Build_Your_Own_DB_In_Go/btree" />
         <item itemvalue="Go Test.TestPanic in Build_Your_Own_DB_In_Go/BTree" />
         <item itemvalue="Go Build.go build Build_Your_Own_DB_In_Go" />
       </list>
@@ -105,7 +136,7 @@
       <option name="presentableId" value="Default" />
       <updated>1704181619281</updated>
       <workItem from="1704181620584" duration="2402000" />
-      <workItem from="1704184275518" duration="14886000" />
+      <workItem from="1704184275518" duration="21968000" />
     </task>
     <servers />
   </component>
@@ -114,5 +145,16 @@
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/btree/Btree.go</url>
+          <line>85</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
